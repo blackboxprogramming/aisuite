@@ -23,7 +23,7 @@ except ImportError:
 class Client:
     def __init__(
         self,
-        provider_configs: dict = {},
+        provider_configs: Optional[dict] = None,
         extra_param_mode: Literal["strict", "warn", "permissive"] = "warn",
     ):
         """
@@ -49,7 +49,11 @@ class Client:
                 - "permissive": Allow all params without validation (testing)
         """
         self.providers = {}
-        self.provider_configs = provider_configs
+        # Keep each client's provider keyword mappings independent. Values may
+        # include SDK clients or callbacks, so retain them without deep-copying.
+        self.provider_configs = {
+            key: dict(config) for key, config in (provider_configs or {}).items()
+        }
         self.extra_param_mode = extra_param_mode
         self.param_validator = ParamValidator(extra_param_mode)
         self._chat = None
@@ -84,7 +88,9 @@ class Client:
         if provider_configs is None:
             return
 
-        self.provider_configs.update(provider_configs)
+        self.provider_configs.update(
+            {key: dict(config) for key, config in provider_configs.items()}
+        )
         # Providers will be lazily initialized when needed
 
     @property
