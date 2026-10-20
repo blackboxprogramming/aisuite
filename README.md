@@ -47,6 +47,22 @@ Install aisuite with all provider libraries:
 pip install 'aisuite[all]'
 ```
 
+## Client configuration ownership
+
+Each `Client` owns its provider configuration dictionary and each provider's
+keyword mapping. Creating or configuring one client does not update another
+client or mutate the supplied mapping. Configure the client explicitly when
+changing settings; mutating an earlier input dictionary no longer updates it.
+
+Values inside a provider mapping, such as SDK clients, callbacks, or nested
+option objects, retain their identity. They are not deep-copied.
+
+Run the focused offline regression checks after installing the project dependencies:
+
+```shell
+python3 -B -m unittest tests.client.test_config_isolation -v
+```
+
 ## Setup
 
 To get started, you will need API Keys for the providers you intend to use. You'll need to
